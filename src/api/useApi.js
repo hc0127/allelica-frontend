@@ -1,14 +1,13 @@
-import { notification } from "antd";
-import React from "react";
 import {
   REGISTER_NEW_TEST,
-  SEARCH_REGISTERED_TEST,//*
+  REGISTER_NEW_TEST_CSV,
+  SEARCH_REGISTERED_TEST,
   UPLOAD_PATIENT_CONSENT,
   GET_PATIENT_REPORT,
   GET_PATIENT_CONSENT,
-  GET_TRACKING_INFO,//*
-  GET_PATIENT_INFO,//*
-  GET_USER_INFO,//*
+  GET_TRACKING_INFO,
+  GET_PATIENT_INFO,
+  GET_USER_INFO,
 } from "./constants";
 
 import useAxiosConfig from "./useAxiosConfig";
@@ -33,6 +32,17 @@ const useApi = () => {
     if (result && result.data) {
       const items = result.data;
 
+      return items;
+    }
+
+    return {};
+  };
+  
+  const register_new_test_csv = async (datas) => {
+    const { url, method } = REGISTER_NEW_TEST_CSV;
+    const result = await axiosInstance[method](url, datas);
+    if (result && result.data) {
+      const items = result.data;
       return items;
     }
 
@@ -125,6 +135,7 @@ const useApi = () => {
 
   return {
     register_new_test,
+    register_new_test_csv,
     search_registered_test,
     upload_patient_consent,
     get_patient_consent,

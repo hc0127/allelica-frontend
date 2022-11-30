@@ -46,9 +46,8 @@ export default function RegisterCSV(props) {
   const primary = theme.palette.primary;
   const disable = theme.palette.disable;
   const white = theme.palette.white;
-  const dispatch = useDispatch();
-
   const [csv, setCSV] = React.useState(null);
+  const {register_new_test_csv} = useApi();
 
   const handleDownload = () => {
     var reader = new FileReader();
@@ -64,6 +63,12 @@ export default function RegisterCSV(props) {
   }
 
   const handleUpload = () => {
+    var reader = new FileReader();
+    reader.onloadend = function () {
+      let base64 = reader.result;
+      register_new_test_csv({csv:base64});
+    };
+    reader.readAsDataURL(csv);
   }
 
   return (

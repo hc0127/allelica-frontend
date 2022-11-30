@@ -59,7 +59,7 @@ ethnicity["HL"] = "HISPANIC LATINO";
 const answer = [];
 answer["Y"] = "Yes";
 answer["N"] = "No";
-answer["U"] = "Unknown";
+answer["O"] = "Unknown";
 
 function PatientCard(props) {
   const theme = useTheme();

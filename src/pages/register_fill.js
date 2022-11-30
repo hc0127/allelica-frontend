@@ -51,14 +51,20 @@ export default function RegisterFill(props) {
 	const [activeStep, setActiveStep] = React.useState(1);
 	const [registered, setRegister] = React.useState(false);
 	const [registerCommon, setRegisterCommon] = React.useState({
+		patientAddress:"",//step1
 		patientFullName: "",
 		patientBirthdate: "2000-01-01",
-		phoneNumber: "",
 		emailAddress: "",
+		phoneNumber: "",
+		physicianFullName: "",
+		physicianEmailAddress: "",
 		barcode: "",
-		sex: "M",
+		note:"",
+
+		sex: "M",//step2
 		ethnicity: "SO",
-		familyHistory: [],
+
+		familyHistory: [],//step3
 		HDLC: 0,
 		LDLC: 0,
 		TOTC: 0,
@@ -66,7 +72,8 @@ export default function RegisterFill(props) {
 		BMI: 0,
 		height: 0,
 		weight: 0,
-		smoke: "Y",
+
+		smoke: "Y",//step4
 		T2D: "Y",
 		myocardialInfarction: "Y",
 		angina: "Y",
@@ -77,9 +84,12 @@ export default function RegisterFill(props) {
 		numberOfChildren: 0,
 		ageMenarche: 0,
 		ageMenopause: 0,
-		PRS: [],
-		shipTo: "",
-		physicianFullName: "",
+
+		patientConsent: "",//step5
+
+		PRS: [],//step6
+		shipsTo: "",
+		shipsToAddress: "",
 	});
 
 	const {
@@ -108,7 +118,16 @@ export default function RegisterFill(props) {
 	}
 
 	if (activeStep === 7) {
-		register_new_test(registerCommon);
+		if(consentForm){
+			var reader = new FileReader();
+			reader.onloadend = function () {
+			  let base64 = reader.result;
+			  register_new_test({...registerCommon,patientConsent:base64});
+			};
+			reader.readAsDataURL(consentForm);
+		}else{
+			register_new_test(registerCommon);
+		}
 		setActiveStep(1);
 		setRegister(true);
 	}
@@ -134,16 +153,16 @@ export default function RegisterFill(props) {
 					</Grid>
 					<Grid item container spacing={2}>
 						<Grid item md={12}>
-							<InputLabel>Please complete this field if you and/or your organization is managing return shipping to the Allelica service laboratory.</InputLabel>
-						</Grid>
-						<Grid item md={12}>
-							<InputLabel>If Allelica is managing your testing logistic, please disregard this field</InputLabel>
+							<p>Please complete this field if you and/or your organization is managing return shipping to the Allelica service laboratory.</p>
+							<p>If Allelica is managing your testing logistic, please disregard this field</p>
 						</Grid>
 						<Grid item md={12}>
 							<TextField
 								fullWidth
 								label="Patient address"
 								variant="outlined"
+								value={registerCommon.patientAddress}
+								onChange={(e) => setRegisterCommon({ ...registerCommon, patientAddress: e.target.value })}
 							/>
 						</Grid>
 						<Grid item md={6}>
@@ -169,6 +188,15 @@ export default function RegisterFill(props) {
 						<Grid item md={6}>
 							<TextField
 								fullWidth
+								label="Email address"
+								variant="outlined"
+								value={registerCommon.emailAddress}
+								onChange={(e) => setRegisterCommon({ ...registerCommon, emailAddress: e.target.value })}
+							/>
+						</Grid>
+						<Grid item md={6}>
+							<TextField
+								fullWidth
 								label="Phone number"
 								variant="outlined"
 								value={registerCommon.phoneNumber}
@@ -178,18 +206,23 @@ export default function RegisterFill(props) {
 						<Grid item md={6}>
 							<TextField
 								fullWidth
-								label="Email address"
+								label="Physician full name"
 								variant="outlined"
-								value={registerCommon.emailAddress}
-								onChange={(e) => setRegisterCommon({ ...registerCommon, emailAddress: e.target.value })}
+								value={registerCommon.physicianFullName}
+								onChange={(e) => setRegisterCommon({ ...registerCommon, physicianFullName: e.target.value })}
+							/>
+						</Grid>
+						<Grid item md={6}>
+							<TextField
+								fullWidth
+								label="Physician email address"
+								variant="outlined"
+								value={registerCommon.physicianEmailAddress}
+								onChange={(e) => setRegisterCommon({ ...registerCommon, physicianEmailAddress: e.target.value })}
 							/>
 						</Grid>
 						<Grid item md={12}>
-							<InputLabel>If Allelica is shipping the test directly to the patient's home, you may leave this field blank.Your patinet will be responsible for
-							</InputLabel>
-						</Grid>
-						<Grid item md={12}>
-							<InputLabel> recording the barcode on the patient Consent Form</InputLabel>
+							<p>If Allelica is shipping the test directly to the patient's home, you may leave this field blank.Your patinet will be responsible for recording the barcode on the patient Consent Form</p>
 						</Grid>
 						<Grid item md={12}>
 							<TextField
@@ -204,8 +237,8 @@ export default function RegisterFill(props) {
 								fullWidth
 								label="Note"
 								variant="outlined"
-							// value={registerCommon.note}
-							// onChange={(e) =>setRegisterCommon({ ...registerCommon, note: e.target.value })}
+								value={registerCommon.note}
+								onChange={(e) =>setRegisterCommon({ ...registerCommon, note: e.target.value })}
 							/>
 						</Grid>
 					</Grid>
@@ -277,7 +310,6 @@ export default function RegisterFill(props) {
 								control={
 									<Checkbox
 										style={{ color: primary.main }}
-										// checked="true"
 										checked={registerCommon.familyHistory.includes('BC')}
 										onChange={(e) => setCheckedState('familyHistory', 'BC')}
 									/>
@@ -414,10 +446,12 @@ export default function RegisterFill(props) {
 										defaultValue="Y"
 										name="radio-buttons-group"
 										row
+										value={registerCommon.smoke}
+										onChange={(e) => setRegisterCommon({ ...registerCommon, smoke: e.target.value })}
 									>
 										<FormControlLabel value="Y" control={<Radio style={{ color: primary.main }} />} label="Yes" />
 										<FormControlLabel value="N" control={<Radio style={{ color: primary.main }} />} label="No" />
-										<FormControlLabel value="U" control={<Radio style={{ color: primary.main }} />} label="Unknown" />
+										<FormControlLabel value="O" control={<Radio style={{ color: primary.main }} />} label="Unknown" />
 									</RadioGroup>
 								</FormControl>
 							</Grid>
@@ -429,10 +463,12 @@ export default function RegisterFill(props) {
 										defaultValue="Y"
 										name="radio-buttons-group"
 										row
+										value={registerCommon.T2D}
+										onChange={(e) => setRegisterCommon({ ...registerCommon, T2D: e.target.value })}
 									>
 										<FormControlLabel value="Y" control={<Radio style={{ color: primary.main }} />} label="Yes" />
 										<FormControlLabel value="N" control={<Radio style={{ color: primary.main }} />} label="No" />
-										<FormControlLabel value="U" control={<Radio style={{ color: primary.main }} />} label="Unknown" />
+										<FormControlLabel value="O" control={<Radio style={{ color: primary.main }} />} label="Unknown" />
 									</RadioGroup>
 								</FormControl>
 							</Grid>
@@ -444,10 +480,12 @@ export default function RegisterFill(props) {
 										defaultValue="Y"
 										name="radio-buttons-group"
 										row
+										value={registerCommon.myocardialInfarction}
+										onChange={(e) => setRegisterCommon({ ...registerCommon, myocardialInfarction: e.target.value })}
 									>
 										<FormControlLabel value="Y" control={<Radio style={{ color: primary.main }} />} label="Yes" />
 										<FormControlLabel value="N" control={<Radio style={{ color: primary.main }} />} label="No" />
-										<FormControlLabel value="U" control={<Radio style={{ color: primary.main }} />} label="Unknown" />
+										<FormControlLabel value="O" control={<Radio style={{ color: primary.main }} />} label="Unknown" />
 									</RadioGroup>
 								</FormControl>
 							</Grid>
@@ -459,10 +497,12 @@ export default function RegisterFill(props) {
 										defaultValue="Y"
 										name="radio-buttons-group"
 										row
+										value={registerCommon.angina}
+										onChange={(e) => setRegisterCommon({ ...registerCommon, angina: e.target.value })}
 									>
 										<FormControlLabel value="Y" control={<Radio style={{ color: primary.main }} />} label="Yes" />
 										<FormControlLabel value="N" control={<Radio style={{ color: primary.main }} />} label="No" />
-										<FormControlLabel value="U" control={<Radio style={{ color: primary.main }} />} label="Unknown" />
+										<FormControlLabel value="O" control={<Radio style={{ color: primary.main }} />} label="Unknown" />
 									</RadioGroup>
 								</FormControl>
 							</Grid>
@@ -474,10 +514,12 @@ export default function RegisterFill(props) {
 										defaultValue="Y"
 										name="radio-buttons-group"
 										row
+										value={registerCommon.statinPrescription}
+										onChange={(e) => setRegisterCommon({ ...registerCommon, statinPrescription: e.target.value })}
 									>
 										<FormControlLabel value="Y" control={<Radio style={{ color: primary.main }} />} label="Yes" />
 										<FormControlLabel value="N" control={<Radio style={{ color: primary.main }} />} label="No" />
-										<FormControlLabel value="U" control={<Radio style={{ color: primary.main }} />} label="Unknown" />
+										<FormControlLabel value="O" control={<Radio style={{ color: primary.main }} />} label="Unknown" />
 									</RadioGroup>
 								</FormControl>
 							</Grid>
@@ -489,10 +531,12 @@ export default function RegisterFill(props) {
 										defaultValue="Y"
 										name="radio-buttons-group"
 										row
+										value={registerCommon.benignBiopsy}
+										onChange={(e) => setRegisterCommon({ ...registerCommon, benignBiopsy: e.target.value })}
 									>
 										<FormControlLabel value="Y" control={<Radio style={{ color: primary.main }} />} label="Yes" />
 										<FormControlLabel value="N" control={<Radio style={{ color: primary.main }} />} label="No" />
-										<FormControlLabel value="U" control={<Radio style={{ color: primary.main }} />} label="Unknown" />
+										<FormControlLabel value="O" control={<Radio style={{ color: primary.main }} />} label="Unknown" />
 									</RadioGroup>
 								</FormControl>
 							</Grid>
@@ -504,10 +548,12 @@ export default function RegisterFill(props) {
 										defaultValue="Y"
 										name="radio-buttons-group"
 										row
+										value={registerCommon.hyperplasia}
+										onChange={(e) => setRegisterCommon({ ...registerCommon, hyperplasia: e.target.value })}
 									>
 										<FormControlLabel value="Y" control={<Radio style={{ color: primary.main }} />} label="Yes" />
 										<FormControlLabel value="N" control={<Radio style={{ color: primary.main }} />} label="No" />
-										<FormControlLabel value="U" control={<Radio style={{ color: primary.main }} />} label="Unknown" />
+										<FormControlLabel value="O" control={<Radio style={{ color: primary.main }} />} label="Unknown" />
 									</RadioGroup>
 								</FormControl>
 							</Grid>
@@ -650,15 +696,23 @@ export default function RegisterFill(props) {
 									defaultValue="M"
 									name="radio-buttons-group"
 									row
+									value={registerCommon.shipsTo}
+									onChange={(e) => setRegisterCommon({ ...registerCommon, shipsTo: e.target.value })}
 								>
-									<FormControlLabel value="M" control={<Radio style={{ color: primary.main }} />} label="Ship kit to office/clinic" />
-									<FormControlLabel value="F" control={<Radio style={{ color: primary.main }} />} label="Ship kit to my patient's home" />
-									<FormControlLabel value="I" control={<Radio style={{ color: primary.main }} />} label="Kit is alreay available for use in my studio/clinic" />
+									<FormControlLabel value="office" control={<Radio style={{ color: primary.main }} />} label="Ship kit to office/clinic" />
+									<FormControlLabel value="patient" control={<Radio style={{ color: primary.main }} />} label="Ship kit to my patient's home" />
+									<FormControlLabel value="studio" control={<Radio style={{ color: primary.main }} />} label="Kit is alreay available for use in my studio/clinic" />
 								</RadioGroup>
 							</FormControl>
 						</Grid>
 						<Grid item md={6}>
-							<TextField fullWidth label="Address" variant="outlined" />
+							<TextField 
+								fullWidth 
+								label="Address" 
+								variant="outlined"
+								value={registerCommon.shipsToAddress}
+								onChange={(e) => setRegisterCommon({ ...registerCommon, shipsToAddress: e.target.value })}
+							/>
 						</Grid>
 					</Grid>
 				</>);

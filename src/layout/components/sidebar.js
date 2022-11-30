@@ -28,7 +28,7 @@ import { makeStyles } from "@material-ui/styles";
 
 const useStyles = makeStyles(theme => ({
   sidebar: {
-    width: 250,
+    width: 300,
     background: theme.palette.primary.main,
     height: "100%",
     position:'fixed',

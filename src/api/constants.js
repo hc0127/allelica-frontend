@@ -4,6 +4,12 @@ const REGISTER_NEW_TEST = {
   url: BASIC_REST + "/registerNewTest",
   method: "post",
 };
+
+const REGISTER_NEW_TEST_CSV = {
+  url: BASIC_REST + "/registerTestCsv",
+  method: "post",
+};
+
 const SEARCH_REGISTERED_TEST = {
   url: BASIC_REST + "/searchRegisteredTest",
   method: "get",
@@ -39,6 +45,7 @@ const GET_USER_INFO = {
 export {
   REGISTER_NEW_TEST,
   SEARCH_REGISTERED_TEST,
+  REGISTER_NEW_TEST_CSV,
   UPLOAD_PATIENT_CONSENT,
   GET_PATIENT_CONSENT,
   GET_PATIENT_REPORT,
