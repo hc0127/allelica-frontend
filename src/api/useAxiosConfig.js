@@ -2,7 +2,6 @@
 import { useState, useMemo } from "react";
 import axios from "axios";
 import { useAuth0 } from "@auth0/auth0-react";
-import { notification } from "antd";
 
 const axiosInstance = axios.create({
   baseURL: "/api",
@@ -26,7 +25,7 @@ function useAxiosConfig() {
   const [isLoading, setIsLoading] = useState(false);
   const [pendingRequests, setPendingRequests] = useState(0);
   const [token, setToken] = useState(null);
-  const { logout, getAccessTokenSilently, user } = useAuth0();
+  const { getAccessTokenSilently } = useAuth0();
 
   async function handleSuccessRequest(config) {
     setPendingRequests(pendingRequests + 1);
@@ -34,8 +33,8 @@ function useAxiosConfig() {
     if (!token) {
       const retrieved_token = await getAccessTokenSilently();
 
-      config.headers.Authorization =  retrieved_token ? `Bearer ${retrieved_token}` : '';
-      
+      config.headers.Authorization = retrieved_token ? `Bearer ${retrieved_token}` : '';
+
       setAuthorization(retrieved_token);
       setToken(retrieved_token);
     }

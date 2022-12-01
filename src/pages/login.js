@@ -1,10 +1,5 @@
 import React from "react";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
-import Routes from "./../router/Routes";
-import Storage from "./../utils/Storage";
-import { useNavigate } from "react-router-dom";
-import * as Actions from "./../store/actions/authAction";
 
 import {
   Grid,
@@ -38,12 +33,7 @@ export default function Login() {
   const theme = useTheme();
   const classes = useStyles();
 
-  const dispatch = useDispatch();
-  const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
-
   const handleLogin = () => {
-    setIsLoading(true);
   };
 
   const valueChange = (target, e) => {

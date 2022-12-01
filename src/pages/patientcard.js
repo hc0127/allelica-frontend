@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import * as Actions from "../store/actions/patientAction";
+import { useSelector } from "react-redux";
 import {
   Grid,
   Breadcrumbs,
@@ -16,7 +15,6 @@ import {
   Science,
   Download,
   Close,
-  SyncAlt,
   Pending,
 } from "@mui/icons-material";
 import { useTheme } from "@material-ui/styles";
@@ -353,16 +351,16 @@ function PatientCard(props) {
                         alignItems="center"
                       >
                         <Grid item container direction="row" spacing={2}>
-                          <Grid item md={8}>
-                            {order.PRS.map((prsitem) => {
+                          <Grid item md={7}>
+                            {order.PRS.map((prsitem, pindex) => {
                               return (
-                                <InputLabel>
+                                <InputLabel key={pindex}>
                                   {PRS[prsitem]}
                                 </InputLabel>
                               )
                             })}
                           </Grid>
-                          <Grid item md={4}>
+                          <Grid item md={5}>
                             <InputLabel>{order.date}</InputLabel>
                           </Grid>
                           <Grid item container direction="row" spacing={2}>

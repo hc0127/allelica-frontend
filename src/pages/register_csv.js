@@ -1,14 +1,11 @@
-import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import * as Actions from "./../store/actions/patientAction";
-import PropTypes from "prop-types";
+import React from "react";
 import {
   Grid,
   Breadcrumbs,
   Typography,
   Paper,
   Button,
-  IconButton 
+  IconButton
 } from "@mui/material";
 
 import {
@@ -19,10 +16,9 @@ import {
 import { IconText, NavLink } from "./components";
 import { FileUploader } from "react-drag-drop-files";
 
-import { useTheme, makeStyles } from "@material-ui/styles";
+import { useTheme } from "@material-ui/styles";
 
 import useApi from "../api/useApi";
-import useAxiosConfig from "../api/useAxiosConfig";
 
 const breadcrumbs = [
   <NavLink underline="hover" key="1" color="inherit" href="/">
@@ -33,21 +29,13 @@ const breadcrumbs = [
   </Typography>,
 ];
 
-const useStyles = makeStyles((theme) => ({
-  NavLink: {
-    textDecoration: "none",
-    color: "white",
-    textColor: "white",
-  },
-}));
-
 export default function RegisterCSV(props) {
   const theme = useTheme();
   const primary = theme.palette.primary;
   const disable = theme.palette.disable;
   const white = theme.palette.white;
   const [csv, setCSV] = React.useState(null);
-  const {register_new_test_csv} = useApi();
+  const { register_new_test_csv } = useApi();
 
   const handleDownload = () => {
     var reader = new FileReader();
@@ -64,16 +52,17 @@ export default function RegisterCSV(props) {
 
   const handleUpload = () => {
     var reader = new FileReader();
-    reader.onloadend = function () {
+    reader.onloadend = function (evt) {
+      console.log(evt);
       let base64 = reader.result;
-      register_new_test_csv({csv:base64});
+      let objbase64 = Buffer.from(base64).toString("base64");
+      register_new_test_csv({ csv: objbase64 });
     };
     reader.readAsDataURL(csv);
   }
 
   return (
     <Grid
-      direction="column"
       sx={{ height: "100vh", marginLeft: "250px", px: "100px", py: "50px" }}
     >
       <Breadcrumbs separator="›" aria-label="breadcrumb" mb={6}>
@@ -94,7 +83,7 @@ export default function RegisterCSV(props) {
                   <FileUploader
                     handleChange={(e) => setCSV(e)}
                     name="file"
-                    types={["PDF"]}
+                    types={["csv"]}
                   />
                 </Grid>
                 {csv &&

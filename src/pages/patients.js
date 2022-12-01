@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import * as Actions from "./../store/actions/patientAction";
-import PropTypes from "prop-types";
 import {
   Grid,
   Breadcrumbs,
@@ -18,7 +17,7 @@ import {
   Paper,
 } from "@mui/material";
 import { Download, Upload, Pending } from "@mui/icons-material";
-import { useTheme, makeStyles } from "@material-ui/styles";
+import { useTheme } from "@material-ui/styles";
 import { ChipTextIcon, NavLink } from "./components";
 import useApi from "../api/useApi";
 
@@ -31,22 +30,14 @@ const breadcrumbs = [
   </Typography>,
 ];
 
-const useStyles = makeStyles((theme) => ({
-  NavLink: {
-    textDecoration: "none",
-    color: "white",
-    textColor: "white",
-  },
-}));
-
 const columns = [
-  { id: "orderId", label: "Order Id", minWidth: 300  },
+  { id: "orderId", label: "Order Id", minWidth: 300 },
   { id: "orderDate", label: "Order Date", format: (value) => value.toLocaleString("en-US"), minWidth: 100 },
   { id: "fullname", label: "Full Name", minWidth: 100 },
   { id: "birth", label: "Date of birth", format: (value) => value.toLocaleString("en-US"), minWidth: 100 },
-  { id: "consentform", label: "Consent form", minWidth: 100 },
-  { id: "teststatus", label: "Test Status", minWidth: 100 },
-  { id: "tags", label: "Tags", minWidth: 300},
+  { id: "consentform", label: "Consent form", minWidth: 120 },
+  { id: "teststatus", label: "Test Status", minWidth: 120 },
+  { id: "tags", label: "Tags", minWidth: 300 },
 ];
 
 const tags = [];
@@ -58,12 +49,6 @@ tags["completed"] = "success";
 
 
 export default function Patients(props) {
-  Patients.propTypes = {
-    count: PropTypes.number.isRequired,
-    onPageChange: PropTypes.func.isRequired,
-    page: PropTypes.number.isRequired,
-    rowsPerPage: PropTypes.number.isRequired,
-  };
 
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -74,7 +59,6 @@ export default function Patients(props) {
   const orange = theme.palette.orange;
   const disable = theme.palette.disable;
 
-  const classes = useStyles();
   const dispatch = useDispatch();
   const fileSelect = useRef(null);
 
@@ -127,8 +111,8 @@ export default function Patients(props) {
     var reader = new FileReader();
     reader.onloadend = function () {
       let base64 = reader.result;
-      console.log(selOrder);
-      upload_patient_consent({ orderId: selOrder, documentBase64: base64 });
+      let objbase64 = Buffer.from(base64).toString("base64");
+      upload_patient_consent({ orderId: selOrder, documentBase64: objbase64 });
     };
     reader.readAsDataURL(doc);
   }

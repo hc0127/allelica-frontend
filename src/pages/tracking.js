@@ -20,7 +20,7 @@ import {
   TextField,
 } from "@mui/material";
 import useApi from "../api/useApi";
-import { useTheme, makeStyles, styled } from "@material-ui/styles";
+import { useTheme } from "@material-ui/styles";
 
 import { NavLink } from "./components";
 
@@ -42,13 +42,6 @@ const columns = [
   { id: "message", label: "Order Status" },
 ];
 
-const useStyles = makeStyles({
-  NavLink: {
-    textDecoration: "none",
-    color: "white",
-    textColor: "white",
-  },
-});
 
 export default function TrackingList(props) {
   TrackingList.propTypes = {
@@ -63,9 +56,6 @@ export default function TrackingList(props) {
 
   const theme = useTheme();
   const primary = theme.palette.primary;
-  const orange = theme.palette.orange;
-  const disable = theme.palette.disable;
-  const classes = useStyles();
 
   const dispatch = useDispatch();
 
@@ -152,10 +142,10 @@ export default function TrackingList(props) {
                           activeStep={tracking.statusId - 1}
                           alternativeLabel
                         >
-                          {steps.map((label, index) => (
-                            <Step key={index}>
+                          {steps.map((label) => (
+                            <Step key={label}>
                               <StepLabel style={{ color: primary.main }}>
-                                {index + 1 == tracking.statusId
+                                {index + 1 === tracking.statusId
                                   ? tracking.message
                                   : ""}
                               </StepLabel>

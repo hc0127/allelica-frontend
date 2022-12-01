@@ -17,6 +17,7 @@ import {
 	RadioGroup,
 	Checkbox,
 	IconButton,
+	CircularProgress,
 } from "@mui/material";
 import {
 	ArrowBack,
@@ -50,8 +51,12 @@ export default function RegisterFill(props) {
 	const [consentForm, setConsentForm] = React.useState(null);
 	const [activeStep, setActiveStep] = React.useState(1);
 	const [registered, setRegister] = React.useState(false);
+	const [loading, setLoading] = React.useState(false);
+	const [requiredValue, setRequired] = React.useState(false);
+	const [requiredPRS, setRequiredPRS] = React.useState(false);
+	const [requiredEmail, setRequiredEmail] = React.useState(false);
 	const [registerCommon, setRegisterCommon] = React.useState({
-		patientAddress:"",//step1
+		patientAddress: "",//step1
 		patientFullName: "",
 		patientBirthdate: "2000-01-01",
 		emailAddress: "",
@@ -59,10 +64,10 @@ export default function RegisterFill(props) {
 		physicianFullName: "",
 		physicianEmailAddress: "",
 		barcode: "",
-		note:"",
+		note: "",
 
-		sex: "M",//step2
-		ethnicity: "SO",
+		sex: "O",//step2
+		ethnicity: "O",
 
 		familyHistory: [],//step3
 		HDLC: 0,
@@ -73,13 +78,13 @@ export default function RegisterFill(props) {
 		height: 0,
 		weight: 0,
 
-		smoke: "Y",//step4
-		T2D: "Y",
-		myocardialInfarction: "Y",
-		angina: "Y",
-		statinPrescription: "Y",
-		benignBiopsy: "Y",
-		hyperplasia: "Y",
+		smoke: "O",//step4
+		T2D: "O",
+		myocardialInfarction: "O",
+		angina: "O",
+		statinPrescription: "O",
+		benignBiopsy: "O",
+		hyperplasia: "O",
 		ageFirstChild: 0,
 		numberOfChildren: 0,
 		ageMenarche: 0,
@@ -117,19 +122,47 @@ export default function RegisterFill(props) {
 		reader.readAsDataURL(consentForm);
 	}
 
-	if (activeStep === 7) {
-		if(consentForm){
-			var reader = new FileReader();
-			reader.onloadend = function () {
-			  let base64 = reader.result;
-			  register_new_test({...registerCommon,patientConsent:base64});
-			};
-			reader.readAsDataURL(consentForm);
-		}else{
-			register_new_test(registerCommon);
+	const validateEmail = (email) => {
+		return email.toLowerCase().match(
+			/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+		);
+	};
+	const setCheckEmail = (item, value) => {
+		if (validateEmail(value) == null) {
+			setRequiredEmail(true);
+		} else {
+			setRequiredEmail(false);
 		}
-		setActiveStep(1);
-		setRegister(true);
+		setRegisterCommon({ ...registerCommon, [item]: value });
+	}
+
+	if (activeStep === 7) {
+		if (!registerCommon.patientFullName || !registerCommon.phoneNumber || !registerCommon.physicianFullName || validateEmail(registerCommon.emailAddress) == null) {
+			setActiveStep(1);
+			setRequired(true);
+			if (validateEmail(registerCommon.emailAddress) == null) {
+				setRequiredEmail(true);
+			}
+		} else if (registerCommon.PRS.length === 0) {
+			setActiveStep(6);
+			setRequiredPRS(true);
+		} else {
+			setLoading(true);
+			if (consentForm) {
+				var reader = new FileReader();
+				reader.onloadend = function () {
+					let base64 = reader.result;
+					let objbase64 = Buffer.from(base64).toString("base64");
+					register_new_test({ ...registerCommon, patientConsent: objbase64 });
+				};
+				reader.readAsDataURL(consentForm);
+			} else {
+				register_new_test(registerCommon);
+			}
+			setActiveStep(1);
+			setRegister(true);
+			setLoading(false);
+		}
 	}
 
 	const setCheckedState = (item, value) => {
@@ -168,8 +201,10 @@ export default function RegisterFill(props) {
 						<Grid item md={6}>
 							<TextField
 								fullWidth
+								required
 								label="Patient full name"
 								variant="outlined"
+								error={(!registerCommon.patientFullName && requiredValue) ? true : false}
 								value={registerCommon.patientFullName}
 								onChange={(e) => setRegisterCommon({ ...registerCommon, patientFullName: e.target.value })}
 							/>
@@ -189,16 +224,21 @@ export default function RegisterFill(props) {
 							<TextField
 								fullWidth
 								label="Email address"
+								type="email"
+								error={requiredEmail ? true : false}
+								required
 								variant="outlined"
 								value={registerCommon.emailAddress}
-								onChange={(e) => setRegisterCommon({ ...registerCommon, emailAddress: e.target.value })}
+								onChange={(e) => setCheckEmail('emailAddress', e.target.value)}
 							/>
 						</Grid>
 						<Grid item md={6}>
 							<TextField
 								fullWidth
+								required
 								label="Phone number"
 								variant="outlined"
+								error={(!registerCommon.phoneNumber && requiredValue) ? true : false}
 								value={registerCommon.phoneNumber}
 								onChange={(e) => setRegisterCommon({ ...registerCommon, phoneNumber: e.target.value })}
 							/>
@@ -206,8 +246,10 @@ export default function RegisterFill(props) {
 						<Grid item md={6}>
 							<TextField
 								fullWidth
+								required
 								label="Physician full name"
 								variant="outlined"
+								error={(!registerCommon.physicianFullName && requiredValue) ? true : false}
 								value={registerCommon.physicianFullName}
 								onChange={(e) => setRegisterCommon({ ...registerCommon, physicianFullName: e.target.value })}
 							/>
@@ -238,7 +280,7 @@ export default function RegisterFill(props) {
 								label="Note"
 								variant="outlined"
 								value={registerCommon.note}
-								onChange={(e) =>setRegisterCommon({ ...registerCommon, note: e.target.value })}
+								onChange={(e) => setRegisterCommon({ ...registerCommon, note: e.target.value })}
 							/>
 						</Grid>
 					</Grid>
@@ -638,7 +680,7 @@ export default function RegisterFill(props) {
 					</Grid>
 					<Grid item container spacing={2}>
 						<Grid item md={12}>
-							<InputLabel>PRS Selection</InputLabel>
+							<InputLabel style={{color:requiredPRS && "red"}}>PRS Selection</InputLabel>
 						</Grid>
 						<Grid item md={12}>
 							<FormControlLabel
@@ -706,9 +748,9 @@ export default function RegisterFill(props) {
 							</FormControl>
 						</Grid>
 						<Grid item md={6}>
-							<TextField 
-								fullWidth 
-								label="Address" 
+							<TextField
+								fullWidth
+								label="Address"
 								variant="outlined"
 								value={registerCommon.shipsToAddress}
 								onChange={(e) => setRegisterCommon({ ...registerCommon, shipsToAddress: e.target.value })}
@@ -716,12 +758,13 @@ export default function RegisterFill(props) {
 						</Grid>
 					</Grid>
 				</>);
+			default:
+				return null;
 		}
 	}
 
 	return (
 		<Grid
-			direction="column"
 			sx={{ height: "100vh", marginLeft: "250px", px: "100px", py: "50px" }}
 			justifyContent="flex-start"
 			alignItems="center"
@@ -784,7 +827,7 @@ export default function RegisterFill(props) {
 									<Grid item>
 										<Button
 											style={{ backgroundColor: disable.main }}
-											disabled={activeStep === 1 && "true"}
+											disabled={activeStep === 1 && true}
 											onClick={() => setActiveStep(activeStep - 1)}
 										>
 											<IconText
@@ -801,13 +844,23 @@ export default function RegisterFill(props) {
 											style={{ backgroundColor: primary.main }}
 											onClick={() => setActiveStep(activeStep + 1)}
 										>
-											<IconText
-												style={{ float: "right" }}
-												direcion="row-reverse"
-												color={white.main}
-												icon={ArrowForward}
-												text="CONTINUE"
-											/>
+											{activeStep === 6 ?
+												<IconText
+													style={{ float: "right" }}
+													direcion="row-reverse"
+													color={white.main}
+													icon={loading ? CircularProgress : ArrowForward}
+													text="REGISTER"
+												/>
+												:
+												<IconText
+													style={{ float: "right" }}
+													direcion="row-reverse"
+													color={white.main}
+													icon={ArrowForward}
+													text="CONTINUE"
+												/>
+											}
 										</Button>
 									</Grid>
 								</Grid>
@@ -824,7 +877,7 @@ export default function RegisterFill(props) {
 					>
 						{steps.map((step, index) => {
 							return (
-								<Grid item>
+								<Grid item key={index}>
 									<IconText
 										color={primary.main}
 										direction="row"
