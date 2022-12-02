@@ -18,6 +18,11 @@ import {
 	Checkbox,
 	IconButton,
 	CircularProgress,
+	Dialog,
+	DialogActions,
+	DialogContent,
+	DialogContentText,
+	DialogTitle,
 } from "@mui/material";
 import {
 	ArrowBack,
@@ -48,6 +53,7 @@ export default function RegisterFill(props) {
 	const disable = theme.palette.disable;
 	const white = theme.palette.white;
 
+	const [open, setOpen] = React.useState(false);
 	const [consentForm, setConsentForm] = React.useState(null);
 	const [activeStep, setActiveStep] = React.useState(1);
 	const [registered, setRegister] = React.useState(false);
@@ -136,6 +142,10 @@ export default function RegisterFill(props) {
 		setRegisterCommon({ ...registerCommon, [item]: value });
 	}
 
+	const handleClose = () =>{
+		setOpen(false);
+	}
+
 	if (activeStep === 7) {
 		if (!registerCommon.patientFullName || !registerCommon.phoneNumber || !registerCommon.physicianFullName || validateEmail(registerCommon.emailAddress) == null) {
 			setActiveStep(1);
@@ -153,14 +163,25 @@ export default function RegisterFill(props) {
 				reader.onloadend = function () {
 					let base64 = reader.result;
 					let objbase64 = Buffer.from(base64).toString("base64");
-					register_new_test({ ...registerCommon, patientConsent: objbase64 });
+					register_new_test({ ...registerCommon, patientConsent: objbase64 }).then(data =>{
+						if(data.result !== "okay"){
+							setOpen(true);
+						}else{
+							setRegister(true);
+						}
+					});
 				};
 				reader.readAsDataURL(consentForm);
 			} else {
-				register_new_test(registerCommon);
+				register_new_test(registerCommon).then(data =>{
+					if(data.result !== "okay"){
+						setOpen(true);
+					}else{
+						setRegister(true);
+					}
+				});
 			}
-			setActiveStep(1);
-			setRegister(true);
+			setActiveStep(6);
 			setLoading(false);
 		}
 	}
@@ -653,6 +674,9 @@ export default function RegisterFill(props) {
 					</Grid>
 					<Grid item container direction="row" alignItems="center">
 						<Grid item md={10}>
+							{consentForm &&
+								<InputLabel>selected:{consentForm.name}</InputLabel>
+							}
 							<FileUploader
 								handleChange={(e) => setConsentForm(e)}
 								name="file"
@@ -890,6 +914,26 @@ export default function RegisterFill(props) {
 					</Grid>
 				</Grid>
 			)}
+			
+			<Dialog
+				open={open}
+				onClose={handleClose}
+				aria-labelledby="responsive-dialog-title"
+			>
+				<DialogTitle id="responsive-dialog-title">
+				Notification
+				</DialogTitle>
+				<DialogContent>
+				<DialogContentText>
+					Regsisteration Error
+				</DialogContentText>
+				</DialogContent>
+				<DialogActions>
+				<Button autoFocus onClick={handleClose}>
+					Close
+				</Button>
+				</DialogActions>
+			</Dialog>
 		</Grid>
 	);
 }

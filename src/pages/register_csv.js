@@ -5,7 +5,12 @@ import {
   Typography,
   Paper,
   Button,
-  IconButton
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from "@mui/material";
 
 import {
@@ -35,6 +40,7 @@ export default function RegisterCSV(props) {
   const disable = theme.palette.disable;
   const white = theme.palette.white;
   const [csv, setCSV] = React.useState(null);
+  const [open, setOpen] = React.useState(false);
   const { register_new_test_csv } = useApi();
 
   const handleDownload = () => {
@@ -50,13 +56,21 @@ export default function RegisterCSV(props) {
     reader.readAsDataURL(csv);
   }
 
+  const handleClose = () =>{
+    setOpen(false);
+  }
+
   const handleUpload = () => {
     var reader = new FileReader();
     reader.onloadend = function (evt) {
       console.log(evt);
       let base64 = reader.result;
       let objbase64 = Buffer.from(base64).toString("base64");
-      register_new_test_csv({ csv: objbase64 });
+      register_new_test_csv({ csv: objbase64 }).then(data =>{
+        if(data.result === "okay"){
+          setOpen(true);
+        }
+      });
     };
     reader.readAsDataURL(csv);
   }
@@ -124,6 +138,25 @@ export default function RegisterCSV(props) {
           </Paper>
         </Grid>
       </Grid>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="responsive-dialog-title"
+      >
+        <DialogTitle id="responsive-dialog-title">
+          Notification
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Regsisteration Success
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button autoFocus onClick={handleClose}>
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Grid>
   );
 }

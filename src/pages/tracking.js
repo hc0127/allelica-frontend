@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import * as Actions from "../store/actions/patientAction";
-import PropTypes from "prop-types";
 import {
   Grid,
   Breadcrumbs,
@@ -44,12 +43,6 @@ const columns = [
 
 
 export default function TrackingList(props) {
-  TrackingList.propTypes = {
-    count: PropTypes.number.isRequired,
-    onPageChange: PropTypes.func.isRequired,
-    page: PropTypes.number.isRequired,
-    rowsPerPage: PropTypes.number.isRequired,
-  };
 
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -142,12 +135,12 @@ export default function TrackingList(props) {
                           activeStep={tracking.statusId - 1}
                           alternativeLabel
                         >
-                          {steps.map((label) => (
-                            <Step key={label}>
+                          {steps.map((label,index) => (
+                            <Step key={index}>
                               <StepLabel style={{ color: primary.main }}>
                                 {index + 1 === tracking.statusId
                                   ? tracking.message
-                                  : ""}
+                                  : label}
                               </StepLabel>
                             </Step>
                           ))}
